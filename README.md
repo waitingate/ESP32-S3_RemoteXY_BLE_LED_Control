@@ -49,8 +49,16 @@ ESP32-S3_RemoteXY_BLE_LED_Control/
 ├── docs/
 │   └── remotexy_original_backup.cpp # Backup of the raw code from RemoteXY editor
 ├── img/
+│   ├── app_01_homescreen.png        # Tutorial: App Home
+│   ├── app_02_main_menu.png         # Tutorial: Main Menu
+│   ├── app_03_add_device.png        # Tutorial: Add Device
+│   ├── app_04_scan_list.png         # Tutorial: Scan List
+│   ├── app_05_connecting.png        # Tutorial: Connecting
+│   ├── app_06_switch_off.png        # Tutorial: UI Off State
+│   ├── app_07_switch_on.png         # Tutorial: UI On State
 │   ├── app_demo_ios.gif             # Animation: App Walkthrough
 │   ├── hardware_demo.gif            # Animation: Hardware Response
+│   ├── hardware_demo_toggle.mp4     # Raw Video: Hardware Response
 │   ├── remotexy_01_config.png       # Screenshot: Editor settings
 │   ├── remotexy_02_editor.png       # Screenshot: GUI design
 │   └── remotexy_03_code.png         # Screenshot: Generated code
@@ -86,7 +94,7 @@ ESP32-S3_RemoteXY_BLE_LED_Control/
 1.  Open the **RemoteXY** app on your phone.
 2.  Enable Bluetooth on your phone.
 3.  Tap `+` (New Device) -\> `Bluetooth BLE`.
-4.  Select **"ESP32S3\_Switch"** from the list.
+4.  Select **"RemoteXY_BLE_LED_Control"** from the list.
 5.  Toggle the switch on the screen.
       * **ON:** External LED turns ON, Built-in RGB turns **GREEN**.
       * **OFF:** Both LEDs turn OFF.
