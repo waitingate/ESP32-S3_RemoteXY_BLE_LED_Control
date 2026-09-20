@@ -82,7 +82,7 @@ ESP32-S3_RemoteXY_BLE_LED_Control/
 
 1.  **Clone the repo:**
     ```bash
-    git clone [https://github.com/welton5532/ESP32-S3_RemoteXY_BLE_LED_Control.git](https://github.com/welton5532/ESP32-S3_RemoteXY_BLE_LED_Control.git)
+    git clone [https://github.com/waitingate/ESP32-S3_RemoteXY_BLE_LED_Control.git](https://github.com/waitingate/ESP32-S3_RemoteXY_BLE_LED_Control.git)
     ```
 2.  **Open in PlatformIO:**
     Open VSCodium, go to the PlatformIO Home, and click "Open Project". Select this folder.
