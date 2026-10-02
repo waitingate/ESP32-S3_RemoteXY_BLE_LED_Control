@@ -1,172 +1,78 @@
-# ESP32-S3 RemoteXY BLE LED Control
+# Switching an LED from a phone over Bluetooth (ESP32-S3, RemoteXY)
 
-A beginner-friendly project for controlling the **ESP32-S3-DevKitC-1U (N8R8)** using Bluetooth Low Energy (BLE) and the **RemoteXY** mobile app.
+One button in the RemoteXY app turns an LED on GPIO 2 and the board's own RGB LED on and off over Bluetooth Low Energy. The app screen is made in the RemoteXY editor, so no app code is needed.
 
-This project demonstrates how to:
-1.  Configure PlatformIO for the **N8R8** (8MB Flash / 8MB PSRAM) module.
-2.  Create a Mobile GUI (Switch & Indicators) without writing app code.
-3.  Control the **Built-in RGB LED** (NeoPixel) and an **External LED** simultaneously.
+It is the smallest RemoteXY example I could make; the same kind of phone control is used in the [ESP32-S3 Vehicle Warning System](https://github.com/waitingate/ESP32-S3_Vehicle_Warning_System).
 
----
+| The app (iPhone) | The board |
+| --- | --- |
+| ![The app](img/app_demo_ios.gif) | ![The board](img/hardware_demo.gif) |
 
-## Project Demo
+## Hardware
 
-Here you can see the system in action.
-* **Left:** The RemoteXY iOS App controlling the device.
-* **Right:** The Physical ESP32-S3 and LED responding instantly.
+- ESP32-S3-DevKitC-1U-N8R8 (8 MB flash, 8 MB octal PSRAM), or another ESP32-S3 board
+- an LED and a 220 Ω or 330 Ω resistor
+- a phone with Bluetooth (Android or iPhone)
 
-| **App View (iOS)** | **Hardware View** |
-| :---: | :---: |
-| ![App Demo](img/app_demo_ios.gif) | ![Hardware Demo](img/hardware_demo.gif) |
+## Wiring
 
----
+| Part | GPIO |
+| --- | --- |
+| LED + (through the resistor) | 2 |
+| LED - | GND |
+| On-board RGB LED (WS2812) | 38, nothing to wire |
 
-## Hardware Required
+Some ESP32-S3 boards have the RGB LED on GPIO 48. If it stays dark, change `PIN_RGB_BUILTIN` in `src/main.cpp`.
 
-* **Development Board:** Espressif ESP32-S3-DevKitC-1U-N8R8 (or similar S3 board).
-* **External LED:** Any standard LED (Red/Blue/Green).
-* **Resistor:** 220Ω or 330Ω (for the external LED).
-* **Smartphone:** Android or iOS with Bluetooth support.
+## Building
 
-## Wiring & Pinout
+1. Install VS Code (or VSCodium) with the PlatformIO extension, and the [RemoteXY app](https://remotexy.com/en/download/) on the phone.
+2. Clone this repo and open the folder in PlatformIO.
+3. Build and upload. PlatformIO installs the RemoteXY library (4.1.8 or newer) by itself.
 
-| Component | ESP32-S3 Pin | Note |
-| :--- | :--- | :--- |
-| **Built-in RGB LED** | `GPIO 38` | Addressable NeoPixel (WS2812). Logic is handled by `neopixelWrite`. |
-| **External LED (+)** | `GPIO 2` | Connect via resistor. |
-| **External LED (-)** | `GND` | Common ground. |
+`platformio.ini` is set up for the N8R8 board (octal PSRAM, 80 MHz flash, default 8 MB partitions). For a board with quad-SPI PSRAM (for example N8R2) or without PSRAM, change `board_build.arduino.memory_type = qio_opi` to `qio_qspi`, or remove that line.
 
-> **Note:** Different ESP32-S3 boards may use different pins for the built-in RGB LED (e.g., GPIO 48). If yours does not light up, check your board's datasheet and update `PIN_RGB_BUILTIN` in `main.cpp`.
+## Using it
 
----
+1. Switch on Bluetooth on the phone and open RemoteXY.
+2. Tap `+`, then Bluetooth LE.
+3. Pick `RemoteXY_BLE_LED_Control` from the list (no password).
+4. Tap the button: LED ON lights the LED on GPIO 2 and turns the RGB LED green; LED OFF turns both off.
 
-## Project File Structure
+<img alt="Add a device" src="img/app_03_add_device.png" width="180" />
+<img alt="The board in the list" src="img/app_04_scan_list.png" width="180" />
+<img alt="LED off" src="img/app_06_switch_off.png" width="180" />
+<img alt="LED on" src="img/app_07_switch_on.png" width="180" />
 
-Here is an overview of the files in this project to help you navigate the code.
+The serial monitor (115200 baud) shows `>> Bluetooth Started. Waiting for App connection...` after a reset.
 
-```text
-ESP32-S3_RemoteXY_BLE_LED_Control/
-├── docs/
-│   └── remotexy_original_backup.cpp # Backup of the raw code from RemoteXY editor
-├── img/
-│   ├── app_01_homescreen.png        # Tutorial: App Home
-│   ├── app_02_main_menu.png         # Tutorial: Main Menu
-│   ├── app_03_add_device.png        # Tutorial: Add Device
-│   ├── app_04_scan_list.png         # Tutorial: Scan List
-│   ├── app_05_connecting.png        # Tutorial: Connecting
-│   ├── app_06_switch_off.png        # Tutorial: UI Off State
-│   ├── app_07_switch_on.png         # Tutorial: UI On State
-│   ├── app_demo_ios.gif             # Animation: App Walkthrough
-│   ├── hardware_demo.gif            # Animation: Hardware Response
-│   ├── hardware_demo_toggle.mp4     # Raw Video: Hardware Response
-│   ├── remotexy_01_config.png       # Screenshot: Editor settings
-│   ├── remotexy_02_editor.png       # Screenshot: GUI design
-│   └── remotexy_03_code.png         # Screenshot: Generated code
-├── platformio.ini                   # (CRITICAL) Project configuration file
-├── src/
-│   └── main.cpp                     # (MAIN) The actual source code (Setup, Loop)
-└── README.md                        # This documentation file
-````
+iPhone: with Low Power Mode on, the connection can fail or the LED reacts late. Turn it off under Settings > Battery. On Android, Battery Saver made no difference.
 
------
+## Changing the app screen
 
-## Software Setup
+1. Open the [RemoteXY editor](https://remotexy.com/en/editor/). Under Configuration choose Bluetooth BLE, ESP32 and Arduino IDE.
 
-### 1. Prerequisites
+   ![Configuration](img/remotexy_01_config.png)
 
-  * [VSCodium](https://vscodium.com/) or VS Code.
-  * [PlatformIO](https://platformio.org/) extension installed.
-  * [RemoteXY App](https://remotexy.com/en/download/) installed on your phone.
+2. Drag buttons, sliders or text onto the phone screen. Each element gets a variable name, for example `pushSwitch_01`; that is the name used in `main.cpp`.
 
-### 2. Installation
+   ![Editor](img/remotexy_02_editor.png)
 
-1.  **Clone the repo:**
-    ```bash
-    git clone [https://github.com/waitingate/ESP32-S3_RemoteXY_BLE_LED_Control.git](https://github.com/waitingate/ESP32-S3_RemoteXY_BLE_LED_Control.git)
-    ```
-2.  **Open in PlatformIO:**
-    Open VSCodium, go to the PlatformIO Home, and click "Open Project". Select this folder.
-3.  **Upload:**
-    Connect your ESP32-S3 via USB. Click the **Right Arrow (→)** icon in the bottom status bar to Build and Upload.
+3. Click Get source code and copy two parts into `src/main.cpp`, replacing the old ones: the `#pragma pack` block with `RemoteXY_CONF_PROGMEM`, and the `struct { ... } RemoteXY;` block.
 
-### 3. Usage
+   ![Generated code](img/remotexy_03_code.png)
 
-1.  Open the **RemoteXY** app on your phone.
-2.  Enable Bluetooth on your phone.
-3.  Tap `+` (New Device) -\> `Bluetooth BLE`.
-4.  Select **"RemoteXY_BLE_LED_Control"** from the list.
-5.  Toggle the switch on the screen.
-      * **ON:** External LED turns ON, Built-in RGB turns **GREEN**.
-      * **OFF:** Both LEDs turn OFF.
+Keep `REMOTEXY_MODE__ESP32CORE_BLE` and the Bluetooth name at the top of `main.cpp`. In `loop()` use `RemoteXYEngine.delay()` instead of `delay()`, so the Bluetooth connection keeps running.
 
------
+`docs/remotexy_original_backup.cpp` is the code exactly as the editor generated it, before my changes.
 
-## Deep Dive: How to Edit the GUI
+## Files
 
-This project uses **RemoteXY**, a platform that allows you to create a mobile interface (GUI) for your microcontroller using a drag-and-drop editor.
-
-If you want to modify this project (e.g., add a slider or change colors), follow these steps:
-
-#### Step 1: Configuration
-
-1.  Go to the [RemoteXY Editor](http://remotexy.com/en/editor/).
-2.  Open the **Configuration** menu on the left.
-3.  Select the following settings to match this project:
-      * **Connection:** `Bluetooth BLE`
-      * **Board:** `ESP32` (Select "ESP32 on board" or "ESP32-S3" if available)
-      * **IDE:** `Arduino IDE`
-
-![RemoteXY Configuration Settings](img/remotexy_01_config.png)
-
-#### Step 2: Design Interface
-
-1.  **Drag and Drop:** Use the left sidebar to drag components like *Switch*, *LED*, or *Text* onto the phone screen area.
-2.  **Properties:** Click on any component to see its properties on the right.
-3.  **Variable Names:** Note the variable name (e.g., `pushSwitch_01`). This is the name you will use in your C++ code to read the button state.
-
-![RemoteXY GUI Editor](img/remotexy_02_editor.png)
-
-#### Step 3: Get the Code
-
-1.  Click the green **"Get Source Code"** button in the top right.
-2.  A popup will appear containing the generated C++ code.
-3.  **Copy only:**
-      * The `#pragma pack...` block (The Configuration Array).
-      * The `struct { ... } RemoteXY;` block (The Variables).
-4.  **Paste** these into your `main.cpp`, replacing the existing configuration blocks.
-
-![RemoteXY Generated Code](img/remotexy_03_code.png)
-
------
-
-## Connectivity & Power Modes (iOS vs Android)
-
-Bluetooth behavior varies significantly between operating systems when "Power Saving" modes are active.
-
-### iPhone (iOS) Users
-
-If you are using an iPhone, you may experience **connection failures** or **significant lag/delay** when toggling the LED.
-
-  * **Reason:** iOS "Low Power Mode" aggressively restricts Bluetooth background activity and reduces data polling rates.
-  * **Solution:** **Disable Low Power Mode** (`Settings` -\> `Battery`) for a smooth experience.
-
-### Android Users
-
-  * **Status:** Generally **Stable**.
-  * Android's "Battery Saver" mode typically allows BLE connections to function normally without noticeable lag for this type of application.
-
------
-
-## PlatformIO Configuration (N8R8)
-
-This project is specifically configured for the **ESP32-S3-WROOM-1U-N8R8** module which uses **Octal SPI (OPI)** for PSRAM.
-
-If you use a standard S3 board (N8R2 or no PSRAM), you may need to edit `platformio.ini`:
-
-  * **Change:** `board_build.arduino.memory_type = qio_opi` -> `qio_qspi` (or remove it).
-
------
+- `src/main.cpp` - the program
+- `platformio.ini` - board settings and the RemoteXY library
+- `docs/remotexy_original_backup.cpp` - the unchanged code from the RemoteXY editor
+- `img/` - screenshots and the demo animations (`hardware_demo_toggle.mp4` is the board video as MP4)
 
 ## License
 
-This project uses the RemoteXY library. Please refer to the [RemoteXY License](https://github.com/RemoteXY/RemoteXY-Arduino-library).
+`main.cpp` started from code generated by the RemoteXY editor, which comes under the MIT licence of the [RemoteXY library](https://github.com/RemoteXY/RemoteXY-Arduino-library).
